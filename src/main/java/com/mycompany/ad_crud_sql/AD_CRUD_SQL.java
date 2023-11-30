@@ -6,6 +6,8 @@ package com.mycompany.ad_crud_sql;
 
 import java.sql.*;
 import java.util.Scanner;
+import oracle.ucp.jdbc.PoolDataSourceFactory;
+import oracle.ucp.jdbc.PoolDataSource;
 
 
 public class AD_CRUD_SQL {
@@ -184,23 +186,58 @@ public class AD_CRUD_SQL {
         
         return res;
     }
+    
+    static public void probandoPool() {
+        
+        try {
+            PoolDataSource pds = PoolDataSourceFactory.getPoolDataSource();
+            pds.setConnectionFactoryClassName( "com.mysql.cj.jdbc.Driver");
+            pds.setURL(DB_URL);
+            pds.setUser(USER);
+            pds.setPassword(PASS);
+
+            Connection conn = pds.getConnection();
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery("SELECT * FROM videojuegos;");
+            
+            while(rs.next()) {
+                System.out.println("ID: " + rs.getInt("id"));
+                System.out.println("Nombre: " +rs.getString("Nombre"));
+                System.out.println("Genero: " + rs.getString("Genero"));
+                System.out.println("Fecha Lanzamiento: " + rs.getDate("FechaLanzamiento"));
+                System.out.println("Compañía: " + rs.getString("Compañia"));
+                System.out.println("Precio: " + rs.getFloat("Precio")+"\n");
+            }
+            
+            conn.close();
+            conn = null;
+            
+        } catch(SQLException e) {
+            e.printStackTrace();
+        }
+        
+        
+    }
 
     public static void main(String[] args) throws SQLException {
         
-        Scanner teclado = new Scanner(System.in);
+        
+        /*Scanner teclado = new Scanner(System.in);
         System.out.print("Introduce el nombre a buscar: ");
         String nombre = teclado.nextLine();
         
         
         if (!buscarNombre(nombre)) {
             System.out.println("No se ha encontrado ningun registro");
-        }
+        }*/
         
         //ejecutarConsulta("SELECT * FROM videojuegos WHERE Nombre = 'Monster Hunter World'");
 
-        nuevoRegistro("prueba", "test", "2010/10/10", "test", 50);
+        /*nuevoRegistro("prueba", "test", "2010/10/10", "test", 50);
         nuevoRegistroManual();
-        eliminarRegistro("prueba");
+        eliminarRegistro("prueba");*/
+
+        probandoPool();
         
     }
 }
