@@ -26,6 +26,7 @@ public class AD_CRUD_SQL {
         
         try {
             Connection conexion = DriverManager.getConnection(DB_URL, USER, PASS);
+            //PreparedStatement
             sentencia = conexion.prepareStatement(querySelect);
             //Sustituimos la interrogacion por la variable
             sentencia.setString(1, nombreBuscado); //Empieza en 1
@@ -40,7 +41,7 @@ public class AD_CRUD_SQL {
             System.out.println("Error al conectar la BBDD: "+ex);
             ex.printStackTrace();
             
-        } finally { //Cerramos la sentencia igusl que son Statement
+        } finally { //Cerramos la sentencia igual que son Statement
             if (sentencia != null) {
                 sentencia.close();
             }
@@ -78,10 +79,12 @@ public class AD_CRUD_SQL {
     static public void nuevoRegistro (String nombre, String genero, String fechaLanzamiento, 
             String compañia, float precio) throws SQLException {
         
+        //Si el id es autogenerado debemos pasar Null como primer valor
         String query = "INSERT INTO videojuegos VALUES (null,?,?,?,?,?);";
                         
         try {
             Connection conexion = DriverManager.getConnection(DB_URL, USER, PASS);
+            //Asignamos el valor al preparedStatement con esta estructura
             sentencia = conexion.prepareStatement(query);
             sentencia.setString(1, nombre);
             sentencia.setString(2, genero);
@@ -121,12 +124,13 @@ public class AD_CRUD_SQL {
         compañia = teclado.nextLine();
         System.out.print("Introduce el precio: ");
         precio = teclado.nextFloat();
-        
-        //String query = "INSERT INTO videojuegos VALUES (null,?,?,?,?,?);";
                         
         try {
             Connection conexion = DriverManager.getConnection(DB_URL, USER, PASS);
-            sentencia = conexion.prepareStatement("INSERT INTO videojuegos VALUES (null,?,?,?,?,?);", PreparedStatement.RETURN_GENERATED_KEYS);
+            //El segundo parámetro indica si la PreparedStatement debe devolver los valores de las claves generadas
+            sentencia = conexion.prepareStatement("INSERT INTO videojuegos VALUES (null,?,?,?,?,?);", 
+            PreparedStatement.RETURN_GENERATED_KEYS);
+            
             sentencia.setString(1, nombre);
             sentencia.setString(2, genero);
             sentencia.setString(3, fechaLanzamiento);
@@ -140,7 +144,7 @@ public class AD_CRUD_SQL {
                 System.out.println("fallo al insertar");
             }
             
-            //Obtener la clave del registro generado
+            //Obtiene la clave del registro generado
             ResultSet rs = sentencia.getGeneratedKeys();
             while (rs.next()) {                
                 int claveGenerada = rs.getInt(1);
@@ -150,6 +154,7 @@ public class AD_CRUD_SQL {
         } catch (SQLException e) {
             System.out.println("Error al conectar la BBDD: "+e);
             e.printStackTrace();
+        
         } finally {
             if (sentencia != null) {
                 sentencia.close();
@@ -166,6 +171,8 @@ public class AD_CRUD_SQL {
         try {
             Connection conexion = DriverManager.getConnection(DB_URL, USER, PASS);
             sentencia = conexion.prepareStatement(query);
+            
+            //Sustituye la primera interrogación de la consulta por el valor pasado por parámetro
             sentencia.setString(1, nombre);
             
             if (sentencia.executeUpdate() > 0) { //Devuelve la cantidad de filas afectadas
@@ -178,6 +185,7 @@ public class AD_CRUD_SQL {
         } catch (SQLException e) {
             System.out.println("Error al conectar la BBDD: "+e);
             e.printStackTrace();
+        
         } finally {
             if (sentencia != null) {
                 sentencia.close();
@@ -187,10 +195,15 @@ public class AD_CRUD_SQL {
         return res;
     }
     
-    static public void probandoPool() {
+    
+    
+    static public void UsandoPoolConexiones() {
         
         try {
+            //Creamos un pool de conexiones
             PoolDataSource pds = PoolDataSourceFactory.getPoolDataSource();
+            
+            //Pasamos los parámetros
             pds.setConnectionFactoryClassName( "com.mysql.cj.jdbc.Driver");
             pds.setURL(DB_URL);
             pds.setUser(USER);
@@ -237,7 +250,7 @@ public class AD_CRUD_SQL {
         nuevoRegistroManual();
         eliminarRegistro("prueba");*/
 
-        probandoPool();
+        UsandoPoolConexiones();
         
     }
 }
